@@ -12,7 +12,7 @@ echo "DOCKERHUB_REPO set to $DOCKERHUB_REPO"
 # we choose based on DOCKERHUB_REPO
 # ${!FOO} is a bashism for an indirect reference
 TMP_EMAIL="DOCKER_EMAIL_$DOCKERHUB_REPO"
-TMP_PASS ="DOCKER_EMAIL_$DOCKERHUB_REPO"
+TMP_PASS="DOCKER_EMAIL_$DOCKERHUB_REPO"
 docker login -e ${!TMP_EMAIL} -u $DOCKERHUB_REPO -p ${!TMP_PASS}
 
 docker images | grep ${DOCKERHUB_REPO}\/ | grep -v deps | grep -v \<none\> | awk '{print $1 ":" $2}'
