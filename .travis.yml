@@ -1,0 +1,51 @@
+language: python
+python:
+  - "2.7"
+
+
+sudo: required
+services:
+  - docker
+
+env:
+    global:
+        - DOCKER_VERSION=1.10.1-0~trusty
+        - TARGETS="aarch64 armv5e armv7a-neon mips64 core2-64 i586"
+        - YP_RELEASE=2.1
+        - ZEPHYR_RELEASE=0.7.5
+        - OSTRO_RELEASE=v1.0.0
+        - CROPS_RELEASE=latest
+
+
+compiler:
+  - gcc
+  - clang
+
+before_install:
+  # list docker-engine versions
+  - apt-cache madison docker-engine
+
+  # upgrade docker-engine to specific version
+  - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
+
+
+script:
+  - docker version
+  - echo "set Docker Repo"
+  - source ./scripts/setDockerhubRepo.sh
+  - echo "Building Base"
+  - chmod 777 ./scripts/build_containers.base
+  - ./scripts/build_containers.base
+  - python tests.py
+  - chmod 777 ./scripts/pushToDockerhub.sh
+  - ./scripts/pushToDockerhub.sh
+
+
+
+
+
+notifications:
+  email:
+    recipients:
+    on_success: change
+    on_failure: always
