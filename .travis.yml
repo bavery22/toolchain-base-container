@@ -43,9 +43,9 @@ script:
   - find ./tests
   - python tests.py
   - chmod 777 ./scripts/pushToDockerhub.sh
+
+after_success:
   - ./scripts/pushToDockerhub.sh
-
-
 
 
 
