@@ -9,29 +9,7 @@ import sys
 import stat
 import imp
 import inspect
-
-def checkPresent(myDict,myStream):
-    for l in myStream:
-        for k,v in  myDict.iteritems():
-            repo=v['name'].split(':')[0]
-            tag=v['name'].split(':')[1]
-            if repo in l and tag in l :
-                v['found']=True
-    present=True
-    for v in  myDict.itervalues():
-        present &= v['found']
-    return present
-
-def printDockerImagesSad(hdr,myDict):
-    cmd="docker images"
-    p=subprocess.Popen(cmd.split(), stderr=sys.stderr, stdout=subprocess.PIPE,
-                       shell=False)
-    print("\n\nFAILURE--%s-- Images ->"%(hdr))
-    for l in p.stdout:
-        print ("%s",l)
-    print ("Looking for:")
-    for k,v in myDict.iteritems():
-        print("%s found = %s"%(v['name'],v['found']))
+from utils.testUtils import *
 
 class TestContainersBuilt(unittest.TestCase):
     def setUp(self):
@@ -42,26 +20,28 @@ class TestContainersBuilt(unittest.TestCase):
         self.sdkCropsRelease = os.environ['CROPS_RELEASE']
         self.travisSlug = os.environ['TRAVIS_REPO_SLUG']
         self.dockerhubRepo = os.environ['DOCKERHUB_REPO']
-        print("travisSlug=%s"%(self.travisSlug))
-        print("dockerhubRepo=%s"%(self.dockerhubRepo))
+        #print("travisSlug=%s"%(self.travisSlug))
+        #print("dockerhubRepo=%s"%(self.dockerhubRepo))
+        self.cList=[]
         self.baseD={}
-        self.baseD['i686']={}
-        self.baseD['i686']['name']="%s/toolchain-base:%s"%(self.dockerhubRepo,"latest")
-        self.baseD['i686']['found']=False
-
+        self.baseD['x86-64']={}
+        self.baseD['x86-64']['name']="%s/toolchain-base:%s"%(self.dockerhubRepo,"latest")
+        self.baseD['x86-64']['found']=False
+        self.cList.append(self.baseD)
     def tearDown(self):
         pass
 
 
-    def test_base_containers_built(self):
+    def test_containers_built(self):
         cmd = """docker  images """
         p=subprocess.Popen(cmd.split(), stderr=sys.stderr, stdout=subprocess.PIPE,
                         shell=False)
-        check=self.baseD
-        allBuilt=checkPresent(check,p.stdout)
-        if not allBuilt:
-            # error information is more useful than true is not false
-            printDockerImagesSad(inspect.stack()[0][3],check)
+        for c in self.cList:
+            check=c
+            allBuilt=checkPresent(check,p.stdout)
+            if not allBuilt:
+                # error information is more useful than true is not false
+                printDockerImagesSad(inspect.stack()[0][3],check)
 
         self.assertTrue(allBuilt)
 
