@@ -14,13 +14,14 @@ from utils.testUtils import *
 
 def checkCurlVersion(majorVersion,minorVersion,myStream):
     v = getField(1,2,myStream)
-    major=v.split('.')[0]
-    minor=v.split('.')[1]
+    major=int(v.split('.')[0])
+    minor=int(v.split('.')[1])
     if major < majorVersion:
         return False
     elif major > majorVersion:
         return True
-    return minor<minorVersion
+
+    return minor>=minorVersion
 
 class TestCurlVersion(unittest.TestCase):
     def setUp(self):
