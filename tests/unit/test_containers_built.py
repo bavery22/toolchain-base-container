@@ -9,7 +9,7 @@ import sys
 import stat
 import imp
 import inspect
-from utils.testUtils import *
+from utils.testutils import *
 
 class TestContainersBuilt(unittest.TestCase):
     def setUp(self):
